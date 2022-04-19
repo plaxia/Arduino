@@ -1,0 +1,119 @@
+#include <LiquidCrystal.h>
+#include <Keypad.h>
+LiquidCrystal lcd (23,22,26,27,28,29);
+int redpin=10;
+int greenpin=9;
+int count=0;
+char kontrol[4];
+char password[4]={'1','1','1','1'};
+
+const byte row = 4; 
+const byte col = 3; 
+char keys[row][col] = {
+    {'1','2','3'},
+    {'4','5','6'},
+    {'7','8','9'},
+    {'*','0','#'}
+};
+
+byte rowPins[row] = {14, 15, 16, 17}; 
+byte colPins[col] = {18, 19, 20}; 
+Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, row, col );
+
+const int flamesens=13;
+int buzzer = 12;
+  int pirpin=6;
+  boolean sensordegeri =0;
+  int relay = 7 ;
+  int led = 10;
+    int lmpin=A0;
+    float tmp;
+void setup() {
+  Serial.begin(9600);
+lcd.begin(16, 2);
+  pinMode(redpin,OUTPUT);
+  pinMode(greenpin,OUTPUT);
+  pinMode(pirpin,INPUT);
+  pinMode(relay,OUTPUT);
+  pinMode(lmpin,INPUT);
+  pinMode(buzzer, OUTPUT);
+  pinMode(flamesens,INPUT);
+  digitalWrite(10,LOW);
+  digitalWrite(9,LOW);
+}
+
+void loop() {
+
+  tmp=analogRead(lmpin);
+  tmp=(5.0*tmp*100.0)/1024.0;
+ 
+lcd.begin(0,0);
+if(tmp<20){
+  
+  lcd.print("LowTmp");
+  lcd.print("\n");
+  lcd.print(tmp);
+  lcd.print("C");
+}
+else if (tmp>30)
+{
+  lcd.print("HghTmp");
+  lcd.print("\n");
+    lcd.print(tmp);
+    lcd.print("C");
+}
+else{
+  lcd.print(tmp);
+  lcd.print("C");
+}
+lcd.print("\n");
+delay(100);
+  int readflame=digitalRead(flamesens);
+  if(readflame==HIGH)
+  {
+    digitalWrite(buzzer, HIGH);
+ 
+  }
+ else{
+  digitalWrite(buzzer, LOW);
+  
+  }
+  
+  sensordegeri=digitalRead(pirpin);
+  delay(150);
+  if(sensordegeri==1)
+  {
+    digitalWrite(relay,HIGH);
+  }
+  else
+  {
+        digitalWrite(relay,LOW);
+
+  }
+  char presskey=keypad.getKey();
+if(presskey!=NO_KEY)
+  {
+  
+   control[count]=presskey;
+    count++;
+     
+    }
+    if(count==4){
+      if(control[0]==password[0]&&control[1]==password[1]&&control[2]==password[2]&&control[3]==password[3])
+      {
+        digitalWrite(greenpin,HIGH);
+        delay(1000); 
+        digitalWrite(greenpin,LOW);
+
+      }
+    else
+    {
+    digitalWrite(redpin,HIGH);  
+    delay(1000); 
+        digitalWrite(redpin,LOW);  
+
+    }
+    count=0;
+  }
+ 
+}
